@@ -1,6 +1,5 @@
 <!-- Model -->
 <?php
-session_start();
 // Check if user click logout
 include_once './logout.php';
 

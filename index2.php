@@ -35,8 +35,6 @@ if (!$_SESSION['logged_in']) {
     <title>Focus - Bootstrap Admin Dashboard </title>
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon.png">
-    <link href="./vendor/pg-calendar/css/pignose.calendar.min.css" rel="stylesheet">
-    <link href="./vendor/chartist/css/chartist.min.css" rel="stylesheet">
     <link href="./css/style.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -201,15 +199,6 @@ if (!$_SESSION['logged_in']) {
     <script src="./vendor/global/global.min.js"></script>
     <script src="./js/quixnav-init.js"></script>
     <script src="./js/custom.min.js"></script>
-
-    <script src="./vendor/chartist/js/chartist.min.js"></script>
-
-    <script src="./vendor/moment/moment.min.js"></script>
-    <script src="./vendor/pg-calendar/js/pignose.calendar.min.js"></script>
-
-
-    <script src="./js/dashboard/dashboard-2.js"></script>
-    <!-- Circle progress -->
 
 </body>
 

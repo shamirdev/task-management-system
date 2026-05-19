@@ -52,9 +52,6 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] == 'employee') {
     <title>Focus - Bootstrap Admin Dashboard </title>
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon.png">
-    <link rel="stylesheet" href="./vendor/owl-carousel/css/owl.carousel.min.css">
-    <link rel="stylesheet" href="./vendor/owl-carousel/css/owl.theme.default.min.css">
-    <link href="./vendor/jqvmap/css/jqvmap.min.css" rel="stylesheet">
     <link href="./css/style.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -201,7 +198,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] == 'employee') {
         ***********************************-->
         <div class="content-body">
             <!-- row -->
-            <div class="container-fluid">
+            <div class="container-fluid mt-3">
                 <div class="row d-flex align-items-center justify-content-center">
                     <div class="col-lg-3 col-sm-6">
                         <div class="card">
@@ -246,11 +243,15 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] == 'employee') {
                 <!-- /# column -->
             </div>
             <div class="row d-flex align-items-center justify-content-around">
-                <div class="col-md-5 card" style="width: 200px; margin-top: 25px; padding:40px; margin-left: 30px;" >
-                    <canvas id="pieChart"></canvas>
+                <div class="col-md-5 card" style="margin-top: 17px; padding:20px; margin-left: 30px;">
+                    <div style="position: relative; height: 280px;">
+                        <canvas id="pieChart"></canvas>
+                    </div>
                 </div>
-                <div class="col-md-6 card" style="width: 400px; margin-top: 25px; padding:20px;">
-                    <canvas id="animatedChart"></canvas>
+                <div class="col-md-6 card" style="margin-top: 17px; padding:20px;">
+                    <div style="position: relative; height: 280px;">
+                        <canvas id="animatedChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -295,31 +296,6 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] == 'employee') {
     <script src="./vendor/global/global.min.js"></script>
     <script src="./js/quixnav-init.js"></script>
     <script src="./js/custom.min.js"></script>
-
-
-    <!-- Vectormap -->
-    <script src="./vendor/raphael/raphael.min.js"></script>
-    <script src="./vendor/morris/morris.min.js"></script>
-
-
-    <script src="./vendor/circle-progress/circle-progress.min.js"></script>
-    <script src="./vendor/chart.js/Chart.bundle.min.js"></script>
-
-    <script src="./vendor/gaugeJS/dist/gauge.min.js"></script>
-
-    <!--  flot-chart js -->
-    <script src="./vendor/flot/jquery.flot.js"></script>
-    <script src="./vendor/flot/jquery.flot.resize.js"></script>
-
-    <!-- Owl Carousel -->
-    <script src="./vendor/owl-carousel/js/owl.carousel.min.js"></script>
-
-    <!-- Counter Up -->
-    <script src="./vendor/jqvmap/js/jquery.vmap.min.js"></script>
-    <script src="./vendor/jqvmap/js/jquery.vmap.usa.js"></script>
-    <script src="./vendor/jquery.counterup/jquery.counterup.min.js"></script>
-    <script src="./js/dashboard/dashboard-1.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.min.js" integrity="sha512-n/G+dROKbKL3GVngGWmWfwK0yPctjZQM752diVYnXZtD/48agpUKLIn0xDQL9ydZ91x6BiOmTIFwWjjFi2kEFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         // Get the canvas element
         const ctx = document.getElementById('animatedChart').getContext('2d');
@@ -342,6 +318,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] == 'employee') {
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 scales: {
                     yAxes: [{
                         ticks: {
@@ -378,6 +355,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] == 'employee') {
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: {
                         position: 'bottom',

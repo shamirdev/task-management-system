@@ -15,7 +15,7 @@
         $result = $conn->query("SHOW TABLES");
         
         if (!$result) {
-            echo "Query failed!";
+            echo "Not Connected. Query failed!";
         }
         // else {
         //     while($row = $result->fetch(PDO::FETCH_ASSOC)) {
