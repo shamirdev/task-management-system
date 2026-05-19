@@ -1,4 +1,11 @@
 
+<!-- Model -->
+ <?php
+ session_start();
+ if(!$_SESSION['logged_in']){
+    header("Location: page-login.php");
+ }
+ ?> 
 <!DOCTYPE html>
 <html lang="en" class="h-100">
 
@@ -20,7 +27,7 @@
                 <div class="col-md-5">
                     <div class="form-input-content text-center">
                         <div class="mb-5">
-                            <a class="btn btn-primary" href="./index.html">Back to Home</a>
+                            <a class="btn btn-primary" href="<?=  ($_SESSION['user_role'] == "employee"? "./index.php": "./index2.php");?>">Back to Home</a>
                         </div>
                         <h1 class="error-text  font-weight-bold">403</h1>
                         <h4 class="mt-4"><i class="fa fa-times-circle text-danger"></i> Forbidden Error!</h4>

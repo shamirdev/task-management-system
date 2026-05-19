@@ -1,0 +1,395 @@
+<!-- Model -->
+<?php
+// DB Connection
+require_once 'config/dbConnect.php';
+include_once 'logout.php';
+//Sweet Alert
+$alert = "";
+// Current url if user is employee and want to change the logic to switch from the employee page
+
+// Checking if user is logged in
+if (empty($_SESSION['logged_in'])) {
+    header("Location: page-login.php");
+    exit();
+} else if ($_SESSION['user_role'] !== "employee") { // checking if user is admin go to admin dashboard
+    header("Location: index2.php");
+    exit();
+} else if ($_SESSION['user_role'] == "admin") {
+    header("Location: page-error-403.php");
+}
+
+if (isset($_SESSION['user_id']) && $_SESSION['user_role'] == 'employee') {
+    try {
+        // Getting all tasks for the logged in user
+        $getStmt = $conn->prepare("SELECT * FROM tasks WHERE user_id = :id");
+        $getStmt->execute([":id" => $_SESSION['user_id']]);
+        $tasks = $getStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Getting completed tasks for the logged in user
+        $getCompletedTasksStmt = $conn->prepare('SELECT * FROM tasks WHERE status = :s AND user_id = :id');
+        $getCompletedTasksStmt->execute([':s' => 'completed', ':id' => $_SESSION['user_id']]);
+        $CompletedTasks = $getCompletedTasksStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Getting pending tasks for the logged in user
+        $getPendingTasksStmt = $conn->prepare('SELECT * FROM tasks WHERE status = :s AND user_id = :id');
+        $getPendingTasksStmt->execute([':s' => 'pending', ':id' => $_SESSION['user_id']]);
+        $PendingTasks = $getPendingTasksStmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        echo "Error:" . $e->getMessage();
+    }
+}
+
+
+?>
+<!-- View -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Focus - Bootstrap Admin Dashboard </title>
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon.png">
+    <link rel="stylesheet" href="./vendor/owl-carousel/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="./vendor/owl-carousel/css/owl.theme.default.min.css">
+    <link href="./vendor/jqvmap/css/jqvmap.min.css" rel="stylesheet">
+    <link href="./css/style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <!--*******************
+        Preloader start
+    ********************-->
+    <div id="preloader">
+        <div class="sk-three-bounce">
+            <div class="sk-child sk-bounce1"></div>
+            <div class="sk-child sk-bounce2"></div>
+            <div class="sk-child sk-bounce3"></div>
+        </div>
+    </div>
+    <!--*******************
+        Preloader end
+    ********************-->
+
+
+    <!--**********************************
+        Main wrapper start
+    ***********************************-->
+    <div id="main-wrapper">
+
+        <!--**********************************
+            Nav header start
+        ***********************************-->
+        <div class="nav-header">
+            <a href="index.php" class="brand-logo">
+                <img class="logo-abbr" src="./images/logo.png" alt="">
+                <img class="logo-compact" src="./images/logo-text.png" alt="">
+                <img class="brand-title" src="./images/logo-text.png" alt="">
+            </a>
+
+            <!-- <div class="nav-control">
+                <div class="hamburger">
+                    <span class="line"></span><span class="line"></span><span class="line"></span>
+                </div>
+            </div> -->
+        </div>
+        <!--**********************************
+            Nav header end
+        ***********************************-->
+
+        <!--**********************************
+            Header start
+        ***********************************-->
+        <div class="header">
+            <div class="header-content">
+                <nav class="navbar navbar-expand">
+                    <div class="collapse navbar-collapse justify-content-start">
+                        <h4 class="welcome-heading">
+                            <span>
+                                Welcome <strong><?php echo ucfirst($_SESSION['user_name']); ?></strong>
+                            </span>
+                        </h4>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        <!--**********************************
+            Header end ti-comment-alt
+        ***********************************-->
+
+        <!--**********************************
+            Sidebar start
+        ***********************************-->
+        <!-- Sidebar start -->
+        <div class="quixnav focus-sidebar">
+            <div class="focus-sidebar-inner">
+
+                <div class="focus-brand">
+                    <div class="focus-logo">
+                        <span>F</span>
+                    </div>
+                    <h4>FOCUS</h4>
+                </div>
+
+                <div class="quixnav-scroll focus-menu-area">
+                    <ul class="metismenu focus-menu" id="menu">
+
+                        <li class="nav-label first">Main Menu</li>
+
+                        <li>
+                            <a href="./index.php" aria-expanded="false" style="background-color: #1F415E;">
+                                <i class="icon icon-single-04"></i>
+                                <span class="nav-text">Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-label">Activities</li>
+
+                        <li>
+                            <a class="has-arrow" href="javascript:void(0)" aria-expanded="false" style="background-color: #1F415E;">
+                                <i class="icon icon-app-store"></i>
+                                <span class="nav-text">Tasks</span>
+                            </a>
+
+                            <ul aria-expanded="false">
+                                <a href="./employeeTasks.php">All Tasks</a>
+                                <a href="./createTasks.php">Create Tasks</a>
+                            </ul>
+                        </li>
+
+                    </ul>
+                </div>
+
+                <div class="focus-user-box">
+                    <div class="focus-user-info">
+                        <div class="focus-avatar">
+                            <?php
+                            $userName = $_SESSION['user_name'] ?? 'User';
+                            echo strtoupper(substr($userName, 0, 1));
+                            ?>
+                        </div>
+
+                        <div>
+                            <h5>
+                                <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'User'); ?>
+                            </h5>
+                            <small><?php echo htmlspecialchars($_SESSION['user_role']); ?></small>
+                        </div>
+                    </div>
+
+                    <form method="POST">
+                        <button type="submit" class="focus-logout-btn" name="logout">
+                            <i class="fa-solid fa-right-to-bracket"></i>
+                            <span class="ml-2">Logout </span>
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        <!-- Sidebar end -->
+        <!--**********************************
+            Sidebar end
+        ***********************************-->
+
+        <!--**********************************
+            Content body start
+        ***********************************-->
+        <div class="content-body">
+            <!-- row -->
+            <div class="container-fluid">
+                <div class="row d-flex align-items-center justify-content-center">
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="card">
+                            <div class="stat-widget-two card-body">
+                                <div class="stat-content">
+                                    <div class="stat-text"> Total Tasks</div>
+                                    <div class="stat-digit"> <?php echo isset($tasks) ? count($tasks) : 0; ?></div>
+                                </div>
+                                <div class="progress"">
+                                    <div class=" progress-bar progress-bar-success w-100" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card">
+                        <div class="stat-widget-two card-body">
+                            <div class="stat-content">
+                                <div class="stat-text">Completed Tasks</div>
+                                <div class="stat-digit"><?php echo isset($CompletedTasks) ? count($CompletedTasks) : 0; ?></div>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-primary w-100" role="progressbar" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="card">
+                        <div class="stat-widget-two card-body">
+                            <div class="stat-content">
+                                <div class="stat-text">Pending Tasks</div>
+                                <div class="stat-digit"><?php echo isset($PendingTasks) ? count($PendingTasks) : 0; ?></div>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-danger w-100" role="progressbar" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /# card -->
+                </div>
+                <!-- /# column -->
+            </div>
+            <div class="row d-flex align-items-center justify-content-around">
+                <div class="col-md-5 card" style="width: 200px; margin-top: 25px; padding:40px; margin-left: 30px;" >
+                    <canvas id="pieChart"></canvas>
+                </div>
+                <div class="col-md-6 card" style="width: 400px; margin-top: 25px; padding:20px;">
+                    <canvas id="animatedChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!--**********************************
+            Content body end
+        ***********************************-->
+
+
+    <!--**********************************
+            Footer start
+        ***********************************-->
+    <!-- <div class="footer">
+            <div class="copyright">
+                <p>Copyright © Designed &amp; Developed by <a href="#" target="_blank">Quixkit</a> 2019</p>
+                <p>Distributed by <a href="https://themewagon.com/" target="_blank">Themewagon</a></p>
+            </div>
+        </div> -->
+    <!--**********************************
+            Footer end
+        ***********************************-->
+
+    <!--**********************************
+           Support ticket button start
+        ***********************************-->
+
+    <!--**********************************
+           Support ticket button end
+        ***********************************-->
+
+
+    </div>
+    <!--**********************************
+        Main wrapper end
+    ***********************************-->
+
+    <!--**********************************
+        Scripts
+    ***********************************-->
+    <!-- Required vendors -->
+    <script src="./vendor/global/global.min.js"></script>
+    <script src="./js/quixnav-init.js"></script>
+    <script src="./js/custom.min.js"></script>
+
+
+    <!-- Vectormap -->
+    <script src="./vendor/raphael/raphael.min.js"></script>
+    <script src="./vendor/morris/morris.min.js"></script>
+
+
+    <script src="./vendor/circle-progress/circle-progress.min.js"></script>
+    <script src="./vendor/chart.js/Chart.bundle.min.js"></script>
+
+    <script src="./vendor/gaugeJS/dist/gauge.min.js"></script>
+
+    <!--  flot-chart js -->
+    <script src="./vendor/flot/jquery.flot.js"></script>
+    <script src="./vendor/flot/jquery.flot.resize.js"></script>
+
+    <!-- Owl Carousel -->
+    <script src="./vendor/owl-carousel/js/owl.carousel.min.js"></script>
+
+    <!-- Counter Up -->
+    <script src="./vendor/jqvmap/js/jquery.vmap.min.js"></script>
+    <script src="./vendor/jqvmap/js/jquery.vmap.usa.js"></script>
+    <script src="./vendor/jquery.counterup/jquery.counterup.min.js"></script>
+    <script src="./js/dashboard/dashboard-1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.min.js" integrity="sha512-n/G+dROKbKL3GVngGWmWfwK0yPctjZQM752diVYnXZtD/48agpUKLIn0xDQL9ydZ91x6BiOmTIFwWjjFi2kEFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        // Get the canvas element
+        const ctx = document.getElementById('animatedChart').getContext('2d');
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        // Create bar chart
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Total Tasks', 'Completed Tasks', 'Pending Tasks'],
+                datasets: [{
+                    label: 'My Tasks',
+                    data: [
+                        <?php echo count($tasks); ?>,
+                        <?php echo count($CompletedTasks); ?>,
+                        <?php echo count($PendingTasks); ?>
+                    ],
+                    backgroundColor: ['#347928', '#C0EBA6', '#FCCD2A'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            min: 0,
+                            stepSize: 1,
+                            precision: 0
+                        }
+                    }]
+                },
+                legend: {
+                    position: 'top'
+                },
+                title: {
+                    display: true,
+                    text: 'My Task Overview'
+                }
+            }
+        });
+        // Create the pie chart
+        new Chart(pieCtx, {
+            type: 'pie', // Type: 'pie', 'doughnut', 'bar', 'line'
+            data: {
+                labels: ['Pending Tasks', 'Completed Tasks'],
+                datasets: [{
+                    label: 'My Tasks',
+                    data: [<?php echo count($PendingTasks); ?>, <?php echo count($CompletedTasks); ?>],
+                    backgroundColor: [
+                        '#5AB2FF', // Pending = red/pink
+                        '#CAF4FF' // Completed = green/teal
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    title: {
+                        display: true,
+                        text: 'My Task Progress'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
