@@ -10,13 +10,22 @@ $alert = "";
 if (!$_SESSION['logged_in']) {
     header("Location: page-login.php");
     exit();
-} else if($_SESSION['user_role'] !== "admin"){
+} else if ($_SESSION['user_role'] !== "admin") {
     header("Location: page-error-403.php");
 } else {
     try {
-        $getStmt = $conn->prepare("SELECT * FROM users WHERE user_id = :user_id");
-        $getStmt->execute(['user_id' => $_SESSION['user_id']]);
-        $user = $getStmt->fetch(PDO::FETCH_ASSOC);
+        $getUsersStmt = $conn->prepare("SELECT * FROM users");
+        $getUsersStmt->execute();
+        $user = $getUsersStmt->fetchAll(PDO::FETCH_ASSOC);
+        $getTasksStmt = $conn->prepare("SELECT * FROM tasks");
+        $getTasksStmt->execute();
+        $tasks = $getTasksStmt->fetchAll(PDO::FETCH_ASSOC);
+        $completedTasks = array_filter($tasks, function ($task) {
+            return $task['status'] === 'completed';
+        });
+        $pendingTasks = array_filter($tasks, function ($task) {
+            return $task['status'] === 'pending';
+        });
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
     }
@@ -74,24 +83,12 @@ if (!$_SESSION['logged_in']) {
         <div class="header">
             <div class="header-content">
                 <nav class="navbar navbar-expand">
-                    <div class="collapse navbar-collapse justify-content-end">
-
-                        <h4 class="pt-3">Welcome <?php echo ucfirst($_SESSION['user_name']); ?></h4>
-                        <ul class="navbar-nav header-right">
-                            <li class="nav-item dropdown header-profile pt-1">
-                                <a class="nav-link" href="#" role="button" data-toggle="dropdown">
-                                    <i class="mdi mdi-account"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <form method="POST">
-                                        <button type="submit" class="dropdown-item" name="logout">
-                                            <i class="fa-solid fa-right-to-bracket"></i>
-                                            <span class="ml-2">Logout </span>
-                                        </button>
-                                    </form>
-                                </div>
-                            </li>
-                        </ul>
+                    <div class="collapse navbar-collapse justify-content-start">
+                        <h4 class="welcome-heading">
+                            <span>
+                                Welcome <strong><?php echo ucfirst($_SESSION['user_name']); ?></strong>
+                            </span>
+                        </h4>
                     </div>
                 </nav>
             </div>
@@ -99,22 +96,70 @@ if (!$_SESSION['logged_in']) {
         <!--Header end ti-comment-alt-->
 
         <!--Sidebar start-->
-        <div class="quixnav">
-            <div class="quixnav-scroll">
-                <ul class="metismenu" id="menu">
-                    <li class="nav-label first">Main Menu</li>
-                    <li><a class="" href="./index2.php" aria-expanded="false"><i
-                                class="icon icon-single-04"></i><span class="nav-text">Dashboard</span></a>
-                    </li>
-                    <li class="nav-label">Activities</li>
-                    <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i
-                                class="fa-solid fa-user"></i><span class="nav-text">&nbsp;&nbsp;&nbsp;Employees & Tasks</span></a>
-                        <ul aria-expanded="false">
-                            <li><a href="./allEmployees.php">All Employees</a></li>
-                            <li><a href="./allTasks.php">All Tasks</a></li>
-                        </ul>
-                    </li>
-                </ul>
+        <div class="quixnav focus-sidebar">
+            <div class="focus-sidebar-inner">
+
+                <div class="focus-brand">
+                    <div class="focus-logo">
+                        <span>F</span>
+                    </div>
+                    <h4>FOCUS</h4>
+                </div>
+
+                <div class="quixnav-scroll focus-menu-area">
+                    <ul class="metismenu focus-menu" id="menu">
+
+                        <li class="nav-label first">Main Menu</li>
+
+                        <li>
+                            <a href="./index.php" aria-expanded="false" style="background-color: #1F415E;">
+                                <i class="icon icon-single-04"></i>
+                                <span class="nav-text">Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-label">Activities</li>
+
+                        <li>
+                            <a class="has-arrow" href="javascript:void(0)" aria-expanded="false" style="background-color: #1F415E;">
+                                <i class="icon icon-app-store"></i>
+                                <span class="nav-text">Tasks</span>
+                            </a>
+
+                            <ul aria-expanded="false">
+                                <a href="./allEmployees.php">All Employees</a>
+                                <a href="./allTasks.php">All Tasks</a>
+                            </ul>
+                        </li>
+
+                    </ul>
+                </div>
+
+                <div class="focus-user-box">
+                    <div class="focus-user-info">
+                        <div class="focus-avatar">
+                            <?php
+                            $userName = $_SESSION['user_name'] ?? 'User';
+                            echo strtoupper(substr($userName, 0, 1));
+                            ?>
+                        </div>
+
+                        <div>
+                            <h5>
+                                <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'User'); ?>
+                            </h5>
+                            <small><?php echo htmlspecialchars($_SESSION['user_role']); ?></small>
+                        </div>
+                    </div>
+
+                    <form method="POST">
+                        <button type="submit" class="focus-logout-btn" name="logout">
+                            <i class="fa-solid fa-right-to-bracket"></i>
+                            <span class="ml-2">Logout </span>
+                        </button>
+                    </form>
+                </div>
+
             </div>
         </div>
         <!--Sidebar end-->
@@ -122,14 +167,14 @@ if (!$_SESSION['logged_in']) {
         <!--Content body start-->
         <div class="content-body">
             <!-- row -->
-            <div class="container-fluid">
+            <div class="container-fluid mt-4">
                 <div class="row d-flex align-items-center justify-content-center">
                     <div class="col-lg-3 col-sm-6">
                         <div class="card">
                             <div class="stat-widget-two card-body">
                                 <div class="stat-content">
-                                    <div class="stat-text"> Total Tasks </div>
-                                    <div class="stat-digit"> <?php echo isset($tasks) ? count($tasks) : 0; ?></div>
+                                    <div class="stat-text"> Total Employees</div>
+                                    <div class="stat-digit"> <?php echo isset($user) ? count($user) : 0; ?></div>
                                 </div>
                                 <div class="progress"">
                                     <div class=" progress-bar progress-bar-primary w-100" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
@@ -141,8 +186,8 @@ if (!$_SESSION['logged_in']) {
                     <div class="card">
                         <div class="stat-widget-two card-body">
                             <div class="stat-content">
-                                <div class="stat-text">Total Employees</div>
-                                <div class="stat-digit"><?php echo isset($CompletedTasks) ? count($CompletedTasks) : 0; ?></div>
+                                <div class="stat-text">Total Tasks</div>
+                                <div class="stat-digit"><?php echo isset($tasks) ? count($tasks) : 0; ?></div>
                             </div>
                             <div class="progress">
                                 <div class="progress-bar progress-bar-warning w-100" role="progressbar" ariavaluenow="78" aria-valuemin="0" aria-valuemax="100"></div>
@@ -155,7 +200,7 @@ if (!$_SESSION['logged_in']) {
                         <div class="stat-widget-two card-body">
                             <div class="stat-content">
                                 <div class="stat-text">Completed Tasks</div>
-                                <div class="stat-digit"><?php echo isset($CompletedTasks) ? count($CompletedTasks) : 0; ?></div>
+                                <div class="stat-digit"><?php echo isset($completedTasks) ? count($completedTasks) : 0; ?></div>
                             </div>
                             <div class="progress">
                                 <div class="progress-bar progress-bar-success w-100" role="progressbar" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
@@ -168,7 +213,7 @@ if (!$_SESSION['logged_in']) {
                         <div class="stat-widget-two card-body">
                             <div class="stat-content">
                                 <div class="stat-text">Pending Tasks</div>
-                                <div class="stat-digit"><?php echo isset($PendingTasks) ? count($PendingTasks) : 0; ?></div>
+                                <div class="stat-digit"><?php echo isset($pendingTasks) ? count($pendingTasks) : 0; ?></div>
                             </div>
                             <div class="progress">
                                 <div class="progress-bar progress-bar-danger w-100" role="progressbar" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
@@ -179,14 +224,19 @@ if (!$_SESSION['logged_in']) {
                 </div>
                 <!-- /# column -->
             </div>
-            <div class="row d-flex align-items-center justify-content-center">
-                <div class="col-md-5" style="width: 400px; margin-top: 25px;">
-                    <canvas id="pieChart"></canvas>
+            p<div class="row align-items-center justify-content-start position-relative" style="gap: 20px;">
+                <div class="col-md-5 card" style="margin-top: 17px; padding:20px; margin-left: 30px;">
+                    <div style="position: relative; height: 280px;">
+                        <canvas id="pieChart"></canvas>
+                    </div>
                 </div>
-                <div class="col-md-6" style="width: 400px; margin-top: 25px;">
-                    <canvas id="animatedChart"></canvas>
+                <div class="col-md-6 card" style="margin-top: 17px; padding:20px;">
+                    <div style="position: relative; height: 280px;">
+                        <canvas id="animatedChart"></canvas>
+                    </div>
                 </div>
             </div>
+            
         </div>
 
     </div>
@@ -199,7 +249,78 @@ if (!$_SESSION['logged_in']) {
     <script src="./vendor/global/global.min.js"></script>
     <script src="./js/quixnav-init.js"></script>
     <script src="./js/custom.min.js"></script>
-
+    <script>
+        // Get the canvas element
+        const ctx = document.getElementById('animatedChart').getContext('2d');
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        // Create bar chart
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Total Tasks', 'Completed Tasks', 'Pending Tasks'],
+                datasets: [{
+                    label: 'My Tasks',
+                    data: [
+                        <?php echo count($tasks); ?>,
+                        <?php echo count($completedTasks); ?>,
+                        <?php echo count($pendingTasks); ?>
+                    ],
+                    backgroundColor: ['#347928', '#C0EBA6', '#FCCD2A'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            min: 0,
+                            stepSize: 1,
+                            precision: 0
+                        }
+                    }]
+                },
+                legend: {
+                    position: 'top'
+                },
+                title: {
+                    display: true,
+                    text: 'My Task Overview'
+                }
+            }
+        });
+        // Create the pie chart
+        new Chart(pieCtx, {
+            type: 'pie', // Type: 'pie', 'doughnut', 'bar', 'line'
+            data: {
+                labels: ['Pending Tasks', 'Completed Tasks'],
+                datasets: [{
+                    label: 'My Tasks',
+                    data: [<?php echo count($pendingTasks); ?>, <?php echo count($completedTasks); ?>],
+                    backgroundColor: [
+                        '#5AB2FF', // Pending = red/pink
+                        '#CAF4FF' // Completed = green/teal
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    title: {
+                        display: true,
+                        text: 'My Task Progress'
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

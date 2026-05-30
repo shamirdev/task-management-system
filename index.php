@@ -154,7 +154,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] == 'employee') {
 
                             <ul aria-expanded="false">
                                 <a href="./employeeTasks.php">All Tasks</a>
-                                <a href="./createTasks.php">Create Tasks</a>
+                                <a href="./createTask.php">Create Tasks</a>
                             </ul>
                         </li>
 

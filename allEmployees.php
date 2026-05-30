@@ -136,8 +136,8 @@ $users = $getUsers->fetchAll(PDO::FETCH_ASSOC);
                     <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i
                                 class="icon icon-app-store"></i><span class="nav-text">Tasks</span></a>
                         <ul aria-expanded="false">
-                            <li><a href="./allEmployees.php">All Employees</a></li>
-                            <li><a href="./allTasks.php">All Tasks</a></li>
+                            <a href="./allEmployees.php">All Employees</a>
+                            <a href="./allTasks.php">All Tasks</a>
                         </ul>
                     </li>
                 </ul>
