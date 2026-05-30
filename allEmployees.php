@@ -81,71 +81,95 @@ $users = $getUsers->fetchAll(PDO::FETCH_ASSOC);
                 <img class="logo-compact" src="./images/logo-text.png" alt="">
                 <img class="brand-title" src="./images/logo-text.png" alt="">
             </a>
-
-            <div class="nav-control">
-                <div class="hamburger">
-                    <span class="line"></span><span class="line"></span><span class="line"></span>
-                </div>
-            </div>
         </div>
         <!--**********************************
             Nav header end
         ***********************************-->
 
-        <!--**********************************
-            Header start
-        ***********************************-->
+        <!--Header start-->
         <div class="header">
             <div class="header-content">
                 <nav class="navbar navbar-expand">
-                    <div class="collapse navbar-collapse justify-content-end">
-                        <ul class="navbar-nav header-right">
-                            <li class="nav-item dropdown header-profile">
-                                <a class="nav-link" href="#" role="button" data-toggle="dropdown">
-                                    <i class="mdi mdi-account"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <form method="POST">
-                                        <button type="submit" class="dropdown-item" name="logout">
-                                            <i class="fa-solid fa-right-to-bracket"></i>
-                                            <span class="ml-2">Logout </span>
-                                        </button>
-                                    </form>
-                                </div>
-                            </li>
-                        </ul>
+                    <div class="collapse navbar-collapse justify-content-start" style="margin-left:-70px;">
+                        <h4 class="welcome-heading">
+                            <span>
+                                Welcome <strong><?php echo ucfirst($_SESSION['user_name']); ?></strong>
+                            </span>
+                        </h4>
                     </div>
                 </nav>
             </div>
         </div>
-        <!--**********************************
-            Header end ti-comment-alt
-        ***********************************-->
+        <!--Header end ti-comment-alt-->
 
-        <!--**********************************
-            Sidebar start
-        ***********************************-->
-        <div class="quixnav">
-            <div class="quixnav-scroll">
-                <ul class="metismenu" id="menu">
-                    <li class="nav-label first">Main Menu</li>
-                    <li><a class="" href="./index2.php" aria-expanded="false"><i
-                                class="icon icon-single-04"></i><span class="nav-text">Dashboard</span></a>
-                    </li>
-                    <li class="nav-label">Activities</li>
-                    <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i
-                                class="icon icon-app-store"></i><span class="nav-text">Tasks</span></a>
-                        <ul aria-expanded="false">
-                            <a href="./allEmployees.php">All Employees</a>
-                            <a href="./allTasks.php">All Tasks</a>
-                        </ul>
-                    </li>
-                </ul>
+        <!--Sidebar start-->
+        <div class="quixnav focus-sidebar">
+            <div class="focus-sidebar-inner">
+
+                <div class="focus-brand">
+                    <div class="focus-logo">
+                        <span>F</span>
+                    </div>
+                    <h4>FOCUS</h4>
+                </div>
+
+                <div class="quixnav-scroll focus-menu-area">
+                    <ul class="metismenu focus-menu" id="menu">
+
+                        <li class="nav-label first">Main Menu</li>
+
+                        <li>
+                            <a href="./index.php" aria-expanded="false" style="background-color: #1F415E;">
+                                <i class="icon icon-single-04"></i>
+                                <span class="nav-text">Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-label">Activities</li>
+
+                        <li>
+                            <a class="has-arrow" href="javascript:void(0)" aria-expanded="false" style="background-color: #1F415E;">
+                                <i class="icon icon-app-store"></i>
+                                <span class="nav-text">Tasks</span>
+                            </a>
+
+                            <ul aria-expanded="false">
+                                <a href="./allEmployees.php">All Employees</a>
+                                <a href="./allTasks.php">All Tasks</a>
+                            </ul>
+                        </li>
+
+                    </ul>
+                </div>
+
+                <div class="focus-user-box">
+                    <div class="focus-user-info">
+                        <div class="focus-avatar">
+                            <?php
+                            $userName = $_SESSION['user_name'] ?? 'User';
+                            echo strtoupper(substr($userName, 0, 1));
+                            ?>
+                        </div>
+
+                        <div>
+                            <h5>
+                                <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'User'); ?>
+                            </h5>
+                            <small><?php echo htmlspecialchars($_SESSION['user_role']); ?></small>
+                        </div>
+                    </div>
+
+                    <form method="POST">
+                        <button type="submit" class="focus-logout-btn" name="logout">
+                            <i class="fa-solid fa-right-to-bracket"></i>
+                            <span class="ml-2">Logout </span>
+                        </button>
+                    </form>
+                </div>
+
             </div>
         </div>
-        <!--**********************************
-            Sidebar end
-        ***********************************-->
+        <!--Sidebar end-->
 
         <!--**********************************
             Content body start

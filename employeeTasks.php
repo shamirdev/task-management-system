@@ -95,7 +95,7 @@ $tasks = $getTasks->fetchAll(PDO::FETCH_ASSOC);
         <div class="header">
             <div class="header-content">
                 <nav class="navbar navbar-expand">
-                    <div class="collapse navbar-collapse justify-content-start">
+                    <div class="collapse navbar-collapse justify-content-start" style="margin-left:-70px;">
                         <h4 class="welcome-heading">
                             <span>
                                 Welcome <strong><?php echo ucfirst($_SESSION['user_name']); ?></strong>

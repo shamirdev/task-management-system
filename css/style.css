@@ -14365,3 +14365,303 @@ html[dir="rtl"] [direction="rtl"][data-sidebar-style="compact"]:not([data-layout
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
     border: 1px solid #edf1f7;
 }
+
+/* ==========================================================================
+   Responsive overrides — Task Management System
+   Off-canvas sidebar, fluid content, stacked dashboard charts, mobile auth
+   ========================================================================== */
+
+/* Medium screens (laptops) — shrink the sidebar slightly to free up content space */
+@media (max-width: 1199.98px) and (min-width: 992px) {
+    .focus-sidebar,
+    .quixnav {
+        width: 230px !important;
+    }
+    .content-body {
+        margin-left: 230px !important;
+    }
+    .header {
+        padding-left: 230px !important;
+    }
+    .nav-header {
+        width: 230px !important;
+    }
+}
+
+/* Tablet + phone — sidebar becomes an off-canvas drawer */
+@media (max-width: 991.98px) {
+    .focus-sidebar,
+    .quixnav {
+        width: 260px !important;
+        transform: translateX(-105%);
+        transition: transform 0.3s ease;
+        will-change: transform;
+    }
+
+    body.sidebar-open .focus-sidebar,
+    body.sidebar-open .quixnav,
+    .focus-sidebar.is-open,
+    .quixnav.is-open {
+        transform: translateX(0);
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Dark overlay behind the open drawer */
+    body.sidebar-open::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 999;
+        animation: focusFadeIn 0.25s ease;
+    }
+
+    @keyframes focusFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* Content + header take the full viewport width */
+    .content-body {
+        margin-left: 0 !important;
+    }
+
+    .header {
+        padding-left: 0 !important;
+        height: auto;
+        min-height: 4rem;
+    }
+
+    /* Nav header (logo strip) stretches across the top so the hamburger is reachable */
+    .nav-header {
+        width: 100% !important;
+        background-color: #ffffff !important;
+        border-bottom: 1px solid #edf1f7;
+        height: 4rem;
+    }
+
+    .nav-header .brand-logo {
+        padding-left: 1rem;
+        justify-content: flex-start;
+    }
+
+    .nav-header .brand-title {
+        display: inline-block !important;
+        max-width: 90px;
+    }
+
+    /* Hamburger: park it at the right edge of the top bar */
+    .nav-control {
+        right: 1rem !important;
+        left: auto !important;
+    }
+
+    .hamburger .line {
+        background: #1b3666 !important;
+    }
+
+    /* Welcome banner — stop floating right, allow wrap, shrink padding */
+    .welcome-heading {
+        float: none !important;
+        height: auto !important;
+        padding: 10px 14px !important;
+        font-size: 14px;
+        line-height: 1.4;
+        flex-wrap: wrap;
+    }
+
+    .welcome-heading span:first-child {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .header .header-content {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    /* Dashboard chart row: cancel inline margin-left/position-relative spacers */
+    .content-body .row.position-relative,
+    .content-body .row {
+        position: static !important;
+    }
+
+    .content-body .row > .col-md-5.card,
+    .content-body .row > .col-md-6.card {
+        margin-left: 0 !important;
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .content-body .row > .card > div[style*="height"] {
+        height: 260px !important;
+    }
+
+    /* Cards / titles inside container-fluid */
+    .content-body .container-fluid {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .page-titles {
+        padding: 12px 8px !important;
+    }
+}
+
+/* Phones */
+@media (max-width: 767.98px) {
+    .focus-sidebar,
+    .quixnav {
+        width: 240px !important;
+    }
+
+    .stat-widget-two {
+        padding: 1rem !important;
+    }
+
+    .stat-widget-two .stat-digit {
+        font-size: 1.5rem !important;
+    }
+
+    .stat-widget-two .stat-text {
+        font-size: 0.9rem;
+    }
+
+    .card .card-header {
+        padding: 0.75rem 1rem;
+    }
+
+    .card .card-header h4.card-title {
+        font-size: 15px;
+    }
+
+    .card .card-body {
+        padding: 1rem;
+    }
+
+    /* Tables — let them scroll horizontally, hide aggressive min-width on parent */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Auth pages (login / register) */
+    .authincation .col-md-6 {
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+
+    .authincation-content {
+        margin: 16px;
+    }
+
+    .auth-form {
+        padding: 22px 18px !important;
+    }
+
+    /* Error pages */
+    .error-page h1.error-text {
+        font-size: 6rem !important;
+    }
+}
+
+/* Small phones */
+@media (max-width: 575.98px) {
+    .nav-header .brand-logo {
+        padding-left: 0.75rem;
+    }
+
+    .welcome-heading {
+        font-size: 13px;
+        padding: 8px 10px !important;
+    }
+
+    .welcome-heading span:first-child {
+        padding: 4px 10px;
+    }
+
+    .focus-user-box {
+        padding: 12px;
+    }
+
+    .focus-user-info {
+        gap: 8px;
+    }
+
+    .focus-brand {
+        padding: 0 16px;
+    }
+
+    .breadcrumb {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    /* Buttons stretch full-width inside small forms */
+    .auth-form .btn-block {
+        font-size: 14px;
+    }
+
+    /* Page error layout */
+    .error-page {
+        padding: 16px;
+        text-align: center;
+    }
+}
+
+/* Keep tables scrollable everywhere so wide DataTables never overflow */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Hamburger is only useful on small screens where the sidebar is off-canvas.
+   On laptops/desktops the sidebar is always docked, so hide the toggle. */
+@media (min-width: 992px) {
+    .nav-control {
+        display: none !important;
+    }
+}
+
+/* Keep the hamburger looking like a hamburger at all times — do not collapse
+   into an X / arrow when the drawer is open. Overrides the template's default
+   .is-active rotations. */
+.hamburger.is-active .line:nth-child(1),
+body.sidebar-open .hamburger .line:nth-child(1) {
+    width: 20px !important;
+    transform: none !important;
+    -webkit-transform: none !important;
+    opacity: 1 !important;
+}
+
+.hamburger.is-active .line:nth-child(2),
+body.sidebar-open .hamburger .line:nth-child(2) {
+    width: 26px !important;
+    transform: none !important;
+    -webkit-transform: none !important;
+    opacity: 1 !important;
+}
+
+.hamburger.is-active .line:nth-child(3),
+body.sidebar-open .hamburger .line:nth-child(3) {
+    width: 22px !important;
+    transform: none !important;
+    -webkit-transform: none !important;
+    opacity: 1 !important;
+}
+
+/* DataTable rows: solid dark text so non-active stripes stay readable.
+   DataTables' default ".display" class fades alternate rows to a light gray
+   that's hard to read against white. Force a consistent dark color and
+   keep the wrapping <a> from inheriting the muted color. */
+#example tbody tr,
+#example tbody td,
+#example tbody tr a,
+#example tbody tr a td {
+    color: #1f2937 !important;
+}
+
+#example tbody tr.odd,
+#example tbody tr.even {
+    color: #1f2937 !important;
+}

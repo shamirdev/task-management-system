@@ -88,11 +88,11 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] == 'employee') {
                 <img class="brand-title" src="./images/logo-text.png" alt="">
             </a>
 
-            <!-- <div class="nav-control">
+            <div class="nav-control">
                 <div class="hamburger">
                     <span class="line"></span><span class="line"></span><span class="line"></span>
                 </div>
-            </div> -->
+            </div>
         </div>
         <!--**********************************
             Nav header end
@@ -104,7 +104,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] == 'employee') {
         <div class="header">
             <div class="header-content">
                 <nav class="navbar navbar-expand">
-                    <div class="collapse navbar-collapse justify-content-start">
+                    <div class="collapse navbar-collapse justify-content-start" style="margin-left:-70px;">
                         <h4 class="welcome-heading">
                             <span>
                                 Welcome <strong><?php echo ucfirst($_SESSION['user_name']); ?></strong>
