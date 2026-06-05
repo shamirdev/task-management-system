@@ -8,7 +8,7 @@ if (isset($_POST['signUpButton'])) {
     $signUpName = htmlspecialchars($_POST['signUpName']);
     $signUpEmail = filter_input(INPUT_POST, 'signUpEmail', FILTER_SANITIZE_EMAIL);
     $signUpPhone = filter_input(INPUT_POST, 'signUpPhone', FILTER_SANITIZE_NUMBER_INT);
-    $signUpPassword = $_POST['signUpPassword'];z
+    $signUpPassword = $_POST['signUpPassword'];
     // $signUpPassword = password_hash($_POST['signUpPassword'], PASSWORD_DEFAULT);
     // $signUpPassword = $_POST['signUpPassword'];
     $alert = "";
