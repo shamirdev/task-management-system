@@ -8,7 +8,7 @@ if (isset($_POST['signUpButton'])) {
     $signUpName = htmlspecialchars($_POST['signUpName']);
     $signUpEmail = filter_input(INPUT_POST, 'signUpEmail', FILTER_SANITIZE_EMAIL);
     $signUpPhone = filter_input(INPUT_POST, 'signUpPhone', FILTER_SANITIZE_NUMBER_INT);
-    $signUpPassword = $_POST['signUpPassword'];
+    $signUpPassword = $_POST['signUpPassword'];z
     // $signUpPassword = password_hash($_POST['signUpPassword'], PASSWORD_DEFAULT);
     // $signUpPassword = $_POST['signUpPassword'];
     $alert = "";
@@ -66,6 +66,22 @@ if (isset($_POST['signUpButton'])) {
     <!-- Sweet Alert -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+     <style>
+        body {
+            background-image: url('./images/task management.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        .glossy{
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(1px);
+            -webkit-backdrop-filter: blur(1px);
+            border-radius: 10px;
+        }
+    </style>
 </head>
 
 <body class="h-100">
@@ -73,7 +89,7 @@ if (isset($_POST['signUpButton'])) {
         <div class="container-fluid h-100">
             <div class="row justify-content-center h-100 align-items-center">
                 <div class="col-md-6">
-                    <div class="authincation-content">
+                    <div class="authincation-content glossy">
                         <div class="row no-gutters">
                             <div class="col-xl-12">
                                 <div class="auth-form">
@@ -100,7 +116,7 @@ if (isset($_POST['signUpButton'])) {
                                             <input name="signUpConfirmPassword" type="password" class="form-control" placeholder="Confirm your password">
                                         </div> -->
                                         <div class="text-center mt-4">
-                                            <button type="submit" class="btn btn-primary btn-block" name="signUpButton">Sign me up</button>
+                                            <button type="submit" class="btn btnPrimary btn-block" name="signUpButton">Sign me up</button>
                                         </div>
                                     </form>
                                     <div class="new-account mt-3">

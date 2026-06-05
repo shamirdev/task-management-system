@@ -66,6 +66,22 @@ if (isset($_POST['signInButton'])) {
     <!-- Sweet Alert -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <style>
+        body {
+            background-image: url('./images/task management.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        .glossy{
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(1px);
+            -webkit-backdrop-filter: blur(1px);
+            border-radius: 10px;
+        }
+    </style>
 </head>
 
 <body class="h-100">
@@ -73,8 +89,9 @@ if (isset($_POST['signInButton'])) {
         <div class="container-fluid h-100">
             <div class="row justify-content-center h-100 align-items-center">
                 <div class="col-md-6">
-                    <div class="authincation-content">
+                    <div class="authincation-content glossy">
                         <div class="row no-gutters">
+            
                             <div class="col-xl-12">
                                 <div class="auth-form">
                                     <h4 class="text-center mb-4">Sign in your account</h4>
@@ -99,7 +116,7 @@ if (isset($_POST['signInButton'])) {
                                             </div>
                                         </div> -->
                                         <div class="text-center">
-                                            <button type="submit" class="btn btn-primary btn-block" name="signInButton">Sign me in</button>
+                                            <button type="submit" class="btn btnPrimary btn-block" name="signInButton">Sign me in</button>
                                         </div>
                                     </form>
                                     <div class="new-account mt-3">

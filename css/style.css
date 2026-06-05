@@ -14665,3 +14665,8 @@ body.sidebar-open .hamburger .line:nth-child(3) {
 #example tbody tr.even {
     color: #1f2937 !important;
 }
+
+.btnPrimary{
+  background-color: #006666;
+  color: white;
+}
