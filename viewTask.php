@@ -134,7 +134,7 @@ try {
                     <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i
                                 class="icon icon-app-store"></i><span class="nav-text">Tasks</span></a>
                         <ul aria-expanded="false">
-                            <li><a href="./allTasks.php">All Tasks</a></li>
+                            <li><a href="./employeeTasks.php">All Tasks</a></li>
                             <!-- <li><a class="has-arrow" href="javascript:void()" aria-expanded="false">Email</a> -->
                             <!-- <ul aria-expanded="false">
                                     <li><a href="./email-compose.php">All Tasks</a></li>
@@ -276,7 +276,7 @@ try {
                                 <h4 class="card-title mb-0">
                                     <i class="fa-solid fa-clipboard-list mr-2"></i> View Task
                                 </h4>
-                                <a href="allTasks.php" class="btn-back-tasks">
+                                <a href="EmployeeTasks.php" class="btn-back-tasks">
                                     <i class="fa-solid fa-arrow-left mr-1"></i> Back to All Tasks
                                 </a>
                             </div>
