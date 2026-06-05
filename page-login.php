@@ -24,9 +24,7 @@ if (isset($_POST['signInButton'])) {
         $getStmt->execute([":email" => $email]);
         $user = $getStmt->fetch(PDO::FETCH_ASSOC);
 
-        // $correcrtPassword = password_verify($password, $user['password']);
-        // var_dump($correcrtPassword);
-        if ($user && $password === $user['password']) {
+        if ($user && password_verify($password, $user['password'])) {
 
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['user_name'] = $user['full_name'];
