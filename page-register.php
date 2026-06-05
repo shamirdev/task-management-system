@@ -3,46 +3,49 @@
 session_start();
 // Include the database connection file
 require_once 'config/dbConnect.php';
+$alert = "";
 // Getting data from input fields
 if (isset($_POST['signUpButton'])) {
-    $signUpName = htmlspecialchars($_POST['signUpName']);
+    $signUpName = htmlspecialchars(trim($_POST['signUpName'] ?? ''), ENT_QUOTES, 'UTF-8');
     $signUpEmail = filter_input(INPUT_POST, 'signUpEmail', FILTER_SANITIZE_EMAIL);
     $signUpPhone = filter_input(INPUT_POST, 'signUpPhone', FILTER_SANITIZE_NUMBER_INT);
-    $signUpPassword = password_hash($_POST['signUpPassword'], PASSWORD_DEFAULT);
-    $alert = "";
+    $signUpPassword = $_POST['signUpPassword'] ?? '';
     // Checking if any of the fields are empty
     if (empty($signUpName) || empty($signUpEmail) || empty($signUpPhone) || empty($signUpPassword)) {
-        echo "All fields are required.";
-        exit();
-    }
+        $alert = "empty_fields";
+    } elseif (strlen($signUpPassword) < 8) {
+        $alert = "password_short";
+    } else {
+        $hashedPassword = password_hash($signUpPassword, PASSWORD_DEFAULT);
 
-    // Submiting data to database
-    try {
-        $getStmt = $conn->prepare("SELECT email, phone_number FROM users WHERE email = :email OR phone_number = :phone_number");
-        $getStmt->execute([":email" => $signUpEmail, ":phone_number" => $signUpPhone]);
-        $existingUser = $getStmt->fetch(PDO::FETCH_ASSOC);
-        if ($existingUser) {
-            if ($existingUser['email'] === $signUpEmail && $existingUser['phone_number'] === $signUpPhone) {
-                $alert = "both_exist";
-            } elseif ($existingUser['email'] === $signUpEmail) {
-                $alert = "email_exist";
-            } elseif ($existingUser['phone_number'] === $signUpPhone) {
-                $alert = "phone_exist";
+        // Submiting data to database
+        try {
+            $getStmt = $conn->prepare("SELECT email, phone_number FROM users WHERE email = :email OR phone_number = :phone_number");
+            $getStmt->execute([":email" => $signUpEmail, ":phone_number" => $signUpPhone]);
+            $existingUser = $getStmt->fetch(PDO::FETCH_ASSOC);
+            if ($existingUser) {
+                if ($existingUser['email'] === $signUpEmail && $existingUser['phone_number'] === $signUpPhone) {
+                    $alert = "both_exist";
+                } elseif ($existingUser['email'] === $signUpEmail) {
+                    $alert = "email_exist";
+                } elseif ($existingUser['phone_number'] === $signUpPhone) {
+                    $alert = "phone_exist";
+                }
+            } else {
+                $postStmt = $conn->prepare("INSERT INTO users (full_name, email, phone_number, password) VALUES (:full_name, :email, :phone_number, :password)");
+                $postStmt->execute([
+                    ":full_name" => $signUpName,
+                    ":email" => $signUpEmail,
+                    ":phone_number" => $signUpPhone,
+                    ":password" => $hashedPassword
+                ]);
+                $_SESSION['success'] = "Registration successful";
+                header("Location: page-login.php");
+                exit();
             }
+        } catch (PDOException $e) {
+            // echo "Error:" . $e->getMessage();
         }
-        $postStmt = $conn->prepare("INSERT INTO users (full_name, email, phone_number, password) VALUES (:full_name, :email, :phone_number, :password)");
-        $postStmt->execute([
-            ":full_name" => $signUpName,
-            ":email" => $signUpEmail,
-            ":phone_number" => $signUpPhone,
-            ":password" => $signUpPassword
-        ]);
-        $_SESSION['success'] = "Registration successful";
-        session_destroy();        
-        header("Location: page-login.php");
-        exit();
-    } catch (PDOException $e) {
-        // echo "Error:" . $e->getMessage();
     }
 }
 // $signUpConfirmPassword = filter_input(INPUT_POST, 'signUpConfirmPassword', FILTER_SANITIZE_STRING);
@@ -92,22 +95,23 @@ if (isset($_POST['signUpButton'])) {
                             <div class="col-xl-12">
                                 <div class="auth-form">
                                     <h4 class="text-center mb-4">Sign up your account</h4>
-                                    <form action="page-register.php" method="post">
+                                    <form action="page-register.php" method="post" id="registerForm" novalidate>
                                         <div class="form-group">
                                             <label><strong>Name</strong></label>
-                                            <input type="text" class="form-control" name="signUpName" placeholder="Enter your full name">
+                                            <input type="text" class="form-control" name="signUpName" placeholder="Enter your full name" required>
                                         </div>
                                         <div class="form-group">
                                             <label><strong>Email</strong></label>
-                                            <input type="email" class="form-control" name="signUpEmail" placeholder="hello@example.com">
+                                            <input type="email" class="form-control" name="signUpEmail" placeholder="hello@example.com" required>
                                         </div>
                                         <div class="form-group">
                                             <label><strong>Phone Number</strong></label>
-                                            <input type="text" class="form-control" name="signUpPhone" placeholder="Enter your phone number">
+                                            <input type="text" class="form-control" name="signUpPhone" placeholder="Enter your phone number" required>
                                         </div>
                                         <div class="form-group">
                                             <label><strong>Password</strong></label>
-                                            <input type="password" class="form-control" name="signUpPassword" placeholder="Enter your password">
+                                            <input type="password" class="form-control" name="signUpPassword" placeholder="Enter your password" minlength="8" aria-describedby="passwordHelp" autocomplete="new-password" required>
+                                            <small id="passwordHelp" class="form-text text-muted">Password must be at least 8 characters long.</small>
                                         </div>
                                         <!-- <div class="form-group">
                                             <label><strong>Confirm Password</strong></label>
@@ -138,8 +142,61 @@ if (isset($_POST['signUpButton'])) {
     <!--endRemoveIf(production)-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            const registerForm = document.getElementById("registerForm");
+            const nameInput = document.querySelector('input[name="signUpName"]');
+            const emailInput = document.querySelector('input[name="signUpEmail"]');
+            const phoneInput = document.querySelector('input[name="signUpPhone"]');
+            const passwordInput = document.querySelector('input[name="signUpPassword"]');
+
+            registerForm.addEventListener("submit", function(event) {
+                if (!nameInput.value.trim() || !emailInput.value.trim() || !phoneInput.value.trim() || !passwordInput.value.trim()) {
+                    event.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Please fill in all fields.'
+                    });
+                    return;
+                }
+
+                if (!emailInput.validity.valid) {
+                    event.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid email',
+                        text: 'Please enter a valid email address.'
+                    }).then(function() {
+                        emailInput.focus();
+                    });
+                    return;
+                }
+
+                if (passwordInput.value.length < 8) {
+                    event.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Password too short',
+                        text: 'Your password must be at least 8 characters long.'
+                    }).then(function() {
+                        passwordInput.focus();
+                    });
+                }
+            });
+
             let alert = "<?php echo $alert; ?>";
-            if (alert === "both_exist") {
+            if (alert === "empty_fields") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Please fill in all fields.'
+                });
+            } else if (alert === "password_short") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Password too short',
+                    text: 'Your password must be at least 8 characters long.'
+                });
+            } else if (alert === "both_exist") {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
