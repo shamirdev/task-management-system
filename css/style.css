@@ -14339,12 +14339,10 @@ html[dir="rtl"] [direction="rtl"][data-sidebar-style="compact"]:not([data-layout
 
 .welcome-heading {
     margin: 0;
-    position: relative;
-    left: 0px;
-    height: 90px;
-    padding-right: 45px;
+    height: 80px;
+    padding-right: 30px;
     display: flex;
-    float: right;
+    float: none;
     align-items: center;
     gap: 12px;
     font-family: 'Poppins', Arial, sans-serif;
@@ -14370,6 +14368,16 @@ html[dir="rtl"] [direction="rtl"][data-sidebar-style="compact"]:not([data-layout
    Responsive overrides — Task Management System
    Off-canvas sidebar, fluid content, stacked dashboard charts, mobile auth
    ========================================================================== */
+
+/* On screens >=992px the focus-sidebar shows the FOCUS brand internally,
+   so the template's .nav-header is redundant and just peeks out from behind
+   the sidebar at >=1800px (where the template shifts it by 50px). Hide it
+   here; the <992px block below re-shows it as the mobile top strip. */
+@media (min-width: 992px) {
+    .nav-header {
+        display: none;
+    }
+}
 
 /* Medium screens (laptops) — shrink the sidebar slightly to free up content space */
 @media (max-width: 1199.98px) and (min-width: 992px) {

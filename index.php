@@ -104,7 +104,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_role'] == 'employee') {
         <div class="header">
             <div class="header-content">
                 <nav class="navbar navbar-expand">
-                    <div class="collapse navbar-collapse justify-content-start" style="margin-left:-70px;">
+                    <div class="collapse navbar-collapse justify-content-end">
                         <h4 class="welcome-heading">
                             <span>
                                 Welcome <strong><?php echo ucfirst($_SESSION['user_name']); ?></strong>
