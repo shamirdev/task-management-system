@@ -1,31 +1,52 @@
 <!-- Model -->
 <?php
-// Check if user click logout
+// DB Connection
+require_once './config/dbConnect.php';
 include_once './logout.php';
 
 if (!isset($_SESSION['logged_in'])) {
     header("Location: page-login.php");
     exit();
-} else if($_SESSION['user_role'] !== "admin"){
+} else if ($_SESSION['user_role'] == "employee") {
     header("Location: page-error-403.php");
-}
-// DB Connection
-require_once 'config/dbConnect.php';
-//Sweet Alert
+} 
+// Sweet Alert
 $alert = "";
-if (isset($_SESSION['update_success'])) {
-    $alert = "update_success";
-    unset($_SESSION['update_success']);
-} else if (isset($_SESSION['delete_success'])) {
-    $alert = "delete_success";
-    unset($_SESSION['delete_success']);
+try{
+    $getEmployees = $conn->prepare("SELECT user_id, full_name FROM users WHERE role = 'employee'");
+    $getEmployees->execute();
+    $employees = $getEmployees->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo "Error: " . $e->getMessage();
 }
 
-$getUsers = $conn->prepare("SELECT * FROM users WHERE role = :role");
-$getUsers->execute(['role' => 'employee']);
-$users = $getUsers->fetchAll(PDO::FETCH_ASSOC);
+if (isset($_POST['create_task'])) {
+    $task_title = trim(htmlspecialchars($_POST['task_title']));
+    $task_description = trim(htmlspecialchars($_POST['task_description']));
+    
+    if (empty($task_title) && empty($task_description)) {
+        $alert = "both_empty";
+    } else if (empty($task_title)) {
+        $alert = "task_title_empty";
+    } else if (empty($task_description)) {
+        $alert = "task_description_empty";
+    } else {
+    if ($_SESSION['user_id']) {
+        try {
+            $postStmt = $conn->prepare("INSERT INTO tasks (user_id, task_title, task_description) VALUES (:user_id, :task_title, :task_description)");
+            $postStmt->execute([
+                "user_id" => $_SESSION['user_id'],
+                "task_title" => $task_title,
+                "task_description" => $task_description
+            ]);
+            $alert = "success";
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    }
+    }
+}
 ?>
-
 <!-- View -->
 <!DOCTYPE html>
 <html lang="en">
@@ -37,17 +58,30 @@ $users = $getUsers->fetchAll(PDO::FETCH_ASSOC);
     <title>Focus - Bootstrap Admin Dashboard </title>
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon.png">
-    <!-- Datatable -->
-    <link href="./vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
+    <!-- Summernote -->
+    <!-- <link href="./vendor/summernote/summernote.css" rel="stylesheet"> -->
     <!-- Custom Stylesheet -->
     <link href="./css/style.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"> -->
+
+    <!-- Summernote CSS -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.css"> -->
 
     <!-- Sweet Alert -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- CK Editor CDN --> 
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+
+    <!-- Style -->
+    <style>
+        .ck-editor__editable {
+            color: #000000 !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -81,12 +115,20 @@ $users = $getUsers->fetchAll(PDO::FETCH_ASSOC);
                 <img class="logo-compact" src="./images/logo-text.png" alt="">
                 <img class="brand-title" src="./images/logo-text.png" alt="">
             </a>
+
+            <div class="nav-control">
+                <div class="hamburger">
+                    <span class="line"></span><span class="line"></span><span class="line"></span>
+                </div>
+            </div>
         </div>
         <!--**********************************
             Nav header end
         ***********************************-->
 
-        <!--Header start-->
+        <!--**********************************
+            Header start
+        ***********************************-->
         <div class="header">
             <div class="header-content">
                 <nav class="navbar navbar-expand">
@@ -100,9 +142,11 @@ $users = $getUsers->fetchAll(PDO::FETCH_ASSOC);
                 </nav>
             </div>
         </div>
-        <!--Header end ti-comment-alt-->
+        <!--**********************************
+            Header end ti-comment-alt
+        ***********************************-->
 
-        <!--Sidebar start-->
+       <!--Sidebar start-->
         <div class="quixnav focus-sidebar">
             <div class="focus-sidebar-inner">
 
@@ -178,54 +222,41 @@ $users = $getUsers->fetchAll(PDO::FETCH_ASSOC);
         ***********************************-->
         <div class="content-body">
             <div class="container-fluid">
-                <div class="row page-titles mx-0">
+                <div class="row page-titles mt-2 w-100 ml-1">
                     <div class="col-sm-6 p-md-0">
                         <div class="welcome-text">
-                            <h4>Welcome Back! <?php echo ucfirst($_SESSION['user_name']); ?></h4>
+                            <h4>Create Your Task!</h4>
+                            <p class="mb-0"><?php echo isset($_SESSION['logged_in']) ? $_SESSION['user_name'] : ''; ?></p>
                         </div>
                     </div>
                     <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="./createTask.php"></a></li>
-                            <li class="breadcrumb-item active"><a href="./createTask.php">Create</a></li>
+                            <li class="breadcrumb-item"><a href=""></a></li>
+                            <li class="breadcrumb-item active"><a href="./employeeTasks.php">All Tasks</a></li>
                         </ol>
                     </div>
                 </div>
                 <!-- row -->
-
-
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-xl-12 col-xxl-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title">Employee List</h4>
+                                <h4 class="card-title">Enter Task Details</h4>
                             </div>
                             <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="example" class="display" style="min-width: 845px">
-                                        <thead>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>Employee Name</th>
-                                                <th>Email</th>
-                                                <th>Phone Number</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                            foreach ($users as $user) {
-                                                echo "
-                                                <tr style='color:black;'>
-                                                    <td>{$user['user_id']}</td>
-                                                    <td>{$user['full_name']}</td>
-                                                    <td>{$user['email']}</td>  
-                                                    <td>{$user['phone_number']}</td>
-                                                </tr>";
-                                            }
-                                            ?>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                <form action="adminCreateTask.php" method="POST">
+                                    <div class="form-group d-flex">
+                                        <input class="form-control form-control-lg w-75" type="text" name="task_title" placeholder="Task Title">
+                                        <select name="status" id="status" class="form-control form-control-lg w-25 ml-2">
+                                            <option value="" disabled>Select Employee</option>
+                                            <option value="pending" <?php echo (($task['status'] ?? '') === 'pending') ? 'selected' : ''; ?>>Pending</option>
+                                            <option value="completed" <?php echo (($task['status'] ?? '') === 'completed') ? 'selected' : ''; ?>>Completed</option>
+                                        </select>
+                                    </div>
+                                    <textarea class="form-control form-control-lg" name="task_description" id="task_description" class="form-control"></textarea>
+                                    <button name="create_task" type="submit" class="btn btn-primary mt-2 float-right">Create Task</button>
+                                </form>
+                                <!-- <div class="summernote"></div> -->
                             </div>
                         </div>
                     </div>
@@ -272,59 +303,82 @@ $users = $getUsers->fetchAll(PDO::FETCH_ASSOC);
     <script src="./js/custom.min.js"></script>
 
 
+    <!-- Summernote -->
+    <!-- <script src="./vendor/summernote/js/summernote.min.js"></script> -->
+    <!-- Summernote init -->
+    <!-- <script src="./js/plugins-init/summernote-init.js"></script> -->
 
-    <!-- Datatable -->
-    <script src="./vendor/datatables/js/jquery.dataTables.min.js"></script>
-    <script src="./js/plugins-init/datatables.init.js"></script>
+    <!-- jQuery -->
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+    <!-- Bootstrap JS -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script> -->
+    <!-- Summernote JS -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.js"></script> -->
 
-    <!-- Custom Js -->
+    <!-- js for summernote -->
+    <!-- <script>
+    $(document).ready(function() {
+    $('#task_description').summernote({
+      height: 300,       // editor height
+      placeholder: 'Task Description', 
+      toolbar: [
+      ['style', ['bold', 'italic', 'underline', 'clear']],
+    //   ['font', ['strikethrough']],   // no fontname here
+      ['para', ['ul', 'ol', 'paragraph']],
+    //   ['insert', ['link', 'picture']],
+      ['view', ['fullscreen', 'codeview']]
+    ]
+    });
+  });
+</script> -->
+
     <script>
-        // const completedBadges = document.querySelectorAll('.completedBadge');
-        // const pendingBadges = document.querySelectorAll('.pendingBadge');
-        let alert = "<?php echo $alert; ?>"
-        if (alert === "update_success") {
+        ClassicEditor
+            .create(document.querySelector('#task_description'), {
+                toolbar: {
+                    items: [
+                        'heading', '|',
+                        'bold', 'italic', '|',
+                        'underline', 'strikethrough', '|',
+                        'bulletedList', 'numberedList', '|',
+                        'link', 'blockQuote', '|',
+                        'undo', 'redo'
+                    ],
+                    shouldNotGroupWhenFull: false
+                },
+                placeholder: 'Task Description'
+            })
+            .catch(error => (console.error(error + "CkEditor Not Working Properly")));
+    </script>
+    <script>
+        // Fire Sweet Alert
+        let alert = "<?php echo $alert ?>";
+        if (alert === "task_title_empty") {
             Swal.fire({
-                icon: 'success',
-                title: 'Task Updated Successfully',
-                showConfirmButton: false,
-                timer: 1500
+                icon: 'error',
+                title: 'Task Title is required',
+                text: 'Please enter a task title.',
             });
-        } else if (alert === "delete_success") {
+        } else if (alert === "task_description_empty") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Task Description is required',
+                text: 'Please enter a task description.',
+            });
+        } else if (alert === "both_empty") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Task Title and Description are required',
+                text: 'Please enter both task title and description.',
+            });
+        } else if (alert === "success") {
             Swal.fire({
                 icon: 'success',
-                title: 'Task Deleted Successfully',
-                showConfirmButton: false,
-                timer: 1500
+                title: 'Task Created Successfully',
+                text: 'Your task has been created.',
             });
         }
-        // Select all buttons with the 'btn-delete' class
-        document.querySelectorAll('.btn-delete').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault(); // Stop the link from redirecting immediately
-
-                const url = this.getAttribute('href');
-                const taskName = this.getAttribute('data-name');
-
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You want to delete: " + taskName,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Yes, Delete It!',
-                    cancelButtonText: 'No, Cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // If the user clicks "Yes", redirect to deleteTask.php
-                        window.location.href = url;
-                    }
-                });
-            });
-        });
     </script>
-    </script>
-
 </body>
 
 </html>

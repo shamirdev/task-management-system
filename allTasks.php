@@ -148,6 +148,8 @@ $tasks = $getTasks->fetchAll(PDO::FETCH_ASSOC);
                             <ul aria-expanded="false">
                                 <a href="./allEmployees.php">All Employees</a>
                                 <a href="./allTasks.php">All Tasks</a>
+                                <a href="./adminAddEmployee.php">Add Employee</a>
+                                <a href="./adminCreateTask.php">Assign Task</a>
                             </ul>
                         </li>
 
